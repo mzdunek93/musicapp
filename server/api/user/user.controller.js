@@ -20,7 +20,24 @@ exports.index = function(req, res) {
   });
 };
 
+/**
+ * Checks if a username/email address is not taken
+ */
 exports.available = function (req, res, next) {
+  var query = {};
+  query[req.query.field] = req.query.value;
+
+  User.findOne(query, function(err, user) {
+    if (err) return next(err);
+    var status = user ? 400 : 200;
+    res.status(status).json({available: !user});
+  });
+};
+
+/**
+ * Checks if a username/email address is not taken
+ */
+exports.friends = function (req, res, next) {
   var query = {};
   query[req.query.field] = req.query.value;
 

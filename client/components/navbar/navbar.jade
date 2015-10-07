@@ -16,6 +16,8 @@ div.navbar.navbar-default.navbar-static-top(ng-controller='NavbarCtrl')
         li(ng-show='isAdmin()', ng-class='{active: isActive("/admin")}')
           a(href='/admin') Admin
 
+      search-box
+
       ul.nav.navbar-nav.navbar-right
         li(ng-hide='isLoggedIn()', ng-class='{active: isActive("/signup")}')
           a(href='/signup') Sign up

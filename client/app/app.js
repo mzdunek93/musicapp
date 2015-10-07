@@ -5,6 +5,7 @@ angular.module('musicappApp', [
   'ngResource',
   'ngSanitize',
   'ngMessages',
+  'ngAnimate',
   'btford.socket-io',
   'ui.router',
   'ui.bootstrap'
