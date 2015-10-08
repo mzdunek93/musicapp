@@ -52,6 +52,14 @@ UserSchema
     return this._passwordConfirmation;
   });
 
+UserSchema
+  .virtual('searchResult')
+  .get(function() {
+    return {
+      'username': this.username
+    };
+  });
+
 // Public profile information
 UserSchema
   .virtual('profile')

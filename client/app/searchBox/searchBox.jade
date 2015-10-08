@@ -1,0 +1,11 @@
+form.navbar-form.navbar-left(role='search')
+  div.form-group
+    input.form-control(type='text' placeholder='search' ng-model='search.query'
+      ng-model-options='{ debounce: { default: 500 } }'
+      ng-focus='search.makeActive()' ng-blur='search.makeInactive()')
+  div.search-results(ng-show='search.showResults')
+    div(ng-show='search.noResults') No results
+    div.search-category(ng-show='search.users.length > 0')
+      div.search-category-header Users
+      div.search-category-result(ng-repeat='user in search.users')
+        | {{user.username}}
