@@ -7,7 +7,12 @@ var crypto = require('crypto');
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
 var UserSchema = new Schema({
-  username: { type: String, required: true },
+  username: {
+    type: String,
+    required: true,
+    minlength: 3,
+    validate: /^\w+$/
+  },
   email: {
     type: String,
     lowercase: true,
@@ -20,6 +25,8 @@ var UserSchema = new Schema({
     default: 'user'
   },
   friends : [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  invited : [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  inviting : [{ type: Schema.Types.ObjectId, ref: 'User' }],
   hashedPassword: { type: String, required: true },
   provider: String,
   salt: String,
@@ -66,7 +73,8 @@ UserSchema
   .get(function() {
     return {
       'username': this.username,
-      'role': this.role
+      'role': this.role,
+      '_id': this._id
     };
   });
 

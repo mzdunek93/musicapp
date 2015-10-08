@@ -8,4 +8,4 @@ form.navbar-form.navbar-left(role='search')
     div.search-category(ng-show='search.users.length > 0')
       div.search-category-header Users
       div.search-category-result(ng-repeat='user in search.users')
-        | {{user.username}}
+        a(ui-sref="main.user({username: user.username})") {{user.username}}

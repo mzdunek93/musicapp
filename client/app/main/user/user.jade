@@ -1,0 +1,5 @@
+div.user-username {{user.username}}
+div(ng-if="!user.isCurrentUser")
+  button(ng-if="user.isNotInvited" ng-click="user.addToFriends()") Add to friends
+  button(ng-if="user.isInvited" ng-click="user.cancelInvitation()") Cancel invitation
+  button(ng-if="user.isFriend" ng-click="user.unfriend()") Remove from friends

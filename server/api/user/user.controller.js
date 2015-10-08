@@ -68,7 +68,7 @@ exports.create = function (req, res, next) {
 exports.show = function (req, res, next) {
   var username = req.params.username;
 
-  User.find({username: username}, function (err, user) {
+  User.findOne({username: username}, function (err, user) {
     if (err) return next(err);
     if (!user) return res.status(401).send('Unauthorized');
     res.json(user.profile);
@@ -103,6 +103,73 @@ exports.changePassword = function(req, res, next) {
       });
     } else {
       res.status(403).send('Forbidden');
+    }
+  });
+};
+
+exports.invite = function(req, res, next) {
+  var userId = req.user._id;
+  var invited;
+
+  User.findById(req.params.id, function(err, user) {
+    if(err) return next(err);
+    invited = user;
+
+    if(!invited) {
+      return res.status(400).send('User doesn\'t exist');
+    }
+
+    if(invited.invited.indexOf(userId) >= 0) {
+      return res.status(400).send('User already invited you');
+    }
+
+    User.findById(userId, function (err, user) {
+      if(user.invited.indexOf(invited._id) === -1) {
+        user.invited.push(invited._id);
+        user.save(function(err) {
+          if (err) return validationError(res, err);
+          res.json(user);
+        });
+      } else {
+        res.status(400).send('User is already invited');
+      }
+    });
+  });
+};
+
+exports.uninvite = function(req, res, next) {
+  var userId = req.user._id;
+  var invited = req.params.id;
+
+  User.findById(userId, function (err, user) {
+    var index = user.invited.indexOf(invited);
+    console.log(invited, userId, user.invited)
+    if(index >= 0) {
+      user.invited.splice(index, 1);
+      user.save(function(err) {
+        if (err) return validationError(res, err);
+        res.json(user);
+      });
+    } else {
+      res.status(400).send('User is already invited');
+    }
+  });
+};
+
+exports.unfriend = function(req, res, next) {
+  var userId = req.user._id;
+  var friend = req.params.id;
+
+  User.findById(userId, function (err, user) {
+    var index = user.friends.indexOf(friend);
+    if(index >= 0) {
+      user.friends.splice(index, 1);
+      user.save(function(err) {
+        if (err) return validationError(res, err);
+        res.json(user);
+      });
+    } else {
+      res.status(400).send('User is already invited');
     }
   });
 };

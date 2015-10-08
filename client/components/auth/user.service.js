@@ -17,6 +17,30 @@ angular.module('musicappApp')
         params: {
           id:'me'
         }
+      },
+      getUser: {
+        method: 'GET',
+        params: {
+          controller:'show'
+        }
+      },
+      invite: {
+        method: 'GET',
+        params: {
+          controller:'invite'
+        }
+      },
+      uninvite: {
+        method: 'GET',
+        params: {
+          controller:'uninvite'
+        }
+      },
+      unfriend: {
+        method: 'GET',
+        params: {
+          controller:'unfriend'
+        }
       }
 	  });
   });

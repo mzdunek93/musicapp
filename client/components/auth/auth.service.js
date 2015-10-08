@@ -92,6 +92,32 @@ angular.module('musicappApp')
         }).$promise;
       },
 
+      invite: function(user, callback, error) {
+        var cb = callback || angular.noop;
+        var error = error || angular.noop;
+
+        return User.invite({
+          id: user._id
+        }, function(user) {
+          return cb(user);
+        }, function(err) {
+          return error(err);
+        }).$promise;
+      },
+
+      uninvite: function(user, callback, error) {
+        var cb = callback || angular.noop;
+        var error = error || angular.noop;
+
+        return User.uninvite({
+          id: user._id
+        }, function(user) {
+          return cb(user);
+        }, function(err) {
+          return error(err);
+        }).$promise;
+      },
+
       /**
        * Gets all available info on authenticated user
        *
