@@ -8,14 +8,17 @@ describe('Directive: searchBox', function () {
 
   var element, scope;
 
-  beforeEach(inject(function ($rootScope) {
+  beforeEach(module('stateMock'));
+
+  beforeEach(inject(function ($rootScope, $state) {
     scope = $rootScope.$new();
+    $state.expectTransitionTo('login');
   }));
 
   it('should make hidden element visible', inject(function ($compile) {
     element = angular.element('<search-box></search-box>');
     element = $compile(element)(scope);
     scope.$apply();
-    expect(element.text()).toBe('this is the searchBox directive');
+    expect(element.text()).toMatch('No results');
   }));
 });

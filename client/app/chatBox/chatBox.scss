@@ -1,0 +1,16 @@
+.chat-container {
+  height: 0;
+}
+
+.chatbox {
+  position: fixed;
+  bottom: 0px;
+
+  .chatbox-header {
+    line-height: 20px;
+  }
+
+  .users-list {
+    height: 200px;
+  }
+}

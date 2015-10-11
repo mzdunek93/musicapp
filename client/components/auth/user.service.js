@@ -18,6 +18,13 @@ angular.module('musicappApp')
           id:'me'
         }
       },
+      getFriends: {
+        method: 'GET',
+        isArray: true,
+        params: {
+          id:'friends'
+        }
+      },
       getUser: {
         method: 'GET',
         params: {
@@ -40,6 +47,18 @@ angular.module('musicappApp')
         method: 'GET',
         params: {
           controller:'unfriend'
+        }
+      },
+      accept: {
+        method: 'GET',
+        params: {
+          controller:'accept'
+        }
+      },
+      reject: {
+        method: 'GET',
+        params: {
+          controller:'reject'
         }
       }
 	  });

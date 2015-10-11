@@ -1,0 +1,4 @@
+div Invitation from
+  a(ui-sref="main.user({username: notification.username})") {{notification.username}}
+  button(ng-click="notifications.acceptInvitation(notification.userId)") Accept
+  button(ng-click="notifications.rejectInvitation(notification.userId)") Reject

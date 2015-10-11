@@ -6,6 +6,22 @@ var Schema = mongoose.Schema;
 var crypto = require('crypto');
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
+var Notification = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true
+  },
+  type: {
+    type: String,
+    enum: ['invitation'],
+    required: true
+  },
+  username: {
+    type: String,
+    required: true
+  }
+});
+
 var UserSchema = new Schema({
   username: {
     type: String,
@@ -24,9 +40,10 @@ var UserSchema = new Schema({
     type: String,
     default: 'user'
   },
-  friends : [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  invited : [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  inviting : [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  invited: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  inviting: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  notifications: [Notification],
   hashedPassword: { type: String, required: true },
   provider: String,
   salt: String,

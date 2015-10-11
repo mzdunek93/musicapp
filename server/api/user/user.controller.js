@@ -4,6 +4,7 @@ var User = require('./user.model');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
+var _ = require('lodash');
 
 var validationError = function(res, err) {
   return res.status(422).json(err);
@@ -34,17 +35,10 @@ exports.available = function (req, res, next) {
   });
 };
 
-/**
- * Checks if a username/email address is not taken
- */
 exports.friends = function (req, res, next) {
-  var query = {};
-  query[req.query.field] = req.query.value;
-
-  User.findOne(query, function(err, user) {
+  User.find({_id: {$in: req.user.friends}}, function(err, users) {
     if (err) return next(err);
-    var status = user ? 400 : 200;
-    res.status(status).json({available: !user});
+    res.status(200).json(users);
   });
 };
 
@@ -109,11 +103,10 @@ exports.changePassword = function(req, res, next) {
 
 exports.invite = function(req, res, next) {
   var userId = req.user._id;
-  var invited;
 
   User.findById(req.params.id, function(err, user) {
     if(err) return next(err);
-    invited = user;
+    var invited = user;
 
     if(!invited) {
       return res.status(400).send('User doesn\'t exist');
@@ -130,6 +123,11 @@ exports.invite = function(req, res, next) {
           if (err) return validationError(res, err);
           res.json(user);
         });
+        invited.inviting.push(userId);
+        invited.notifications.push({userId: userId, username: user.username, type: 'invitation'});
+        invited.save(function(err) {
+          if (err) return validationError(res, err);
+        });
       } else {
         res.status(400).send('User is already invited');
       }
@@ -139,38 +137,139 @@ exports.invite = function(req, res, next) {
 
 exports.uninvite = function(req, res, next) {
   var userId = req.user._id;
-  var invited = req.params.id;
 
-  User.findById(userId, function (err, user) {
-    var index = user.invited.indexOf(invited);
-    console.log(invited, userId, user.invited)
-    if(index >= 0) {
-      user.invited.splice(index, 1);
-      user.save(function(err) {
-        if (err) return validationError(res, err);
-        res.json(user);
-      });
-    } else {
-      res.status(400).send('User is already invited');
+  User.findOne({_id: req.params.id, 'notifications.userId': userId},
+    {'notifications.$': 1, 'inviting': 1}, function(err, user) {
+    if(err) return next(err);
+    var invited = user;
+
+    if(!invited) {
+      return res.status(400).send('User doesn\'t exist');
     }
+
+    User.findById(userId, function (err, user) {
+      var index = user.invited.indexOf(invited._id);
+      if(index >= 0) {
+        user.invited.splice(index, 1);
+        user.save(function(err) {
+          if (err) return validationError(res, err);
+          res.json(user);
+        });
+        index = invited.inviting.indexOf(userId);
+        invited.inviting.splice(index, 1);
+        invited.notifications[0].remove();
+        invited.update(invited, function(err) {
+          if (err) return validationError(res, err);
+        });
+      } else {
+        res.status(400).send('User is not invited');
+      }
+    });
   });
 };
 
 exports.unfriend = function(req, res, next) {
   var userId = req.user._id;
-  var friend = req.params.id;
 
-  User.findById(userId, function (err, user) {
-    var index = user.friends.indexOf(friend);
-    if(index >= 0) {
-      user.friends.splice(index, 1);
-      user.save(function(err) {
-        if (err) return validationError(res, err);
-        res.json(user);
-      });
-    } else {
-      res.status(400).send('User is already invited');
+  User.findById(req.params.id, function(err, user) {
+    if(err) return next(err);
+    var friend = user;
+
+    if(!friend) {
+      return res.status(400).send('User doesn\'t exist');
     }
+
+    if(friend.friends.indexOf(userId) === -1) {
+      return res.status(400).send('User is not your friend');
+    }
+
+    User.findById(userId, function (err, user) {
+      var index = user.friends.indexOf(friend._id);
+      if(index >= 0) {
+        user.friends.splice(index, 1);
+        user.save(function(err) {
+          if (err) return validationError(res, err);
+          res.json(user);
+        });
+        index = friend.friends.indexOf(userId);
+        friend.friends.splice(index, 1);
+        friend.save(function(err) {
+          if (err) return validationError(res, err);
+        });
+      } else {
+        res.status(400).send('User is not your friend');
+      }
+    });
+  });
+};
+
+exports.accept = function(req, res, next) {
+  var userId = req.user._id;
+  var inviting = req.params.id;
+
+  User.findById(req.params.id, function(err, user) {
+    if(err) return next(err);
+    var inviting = user;
+
+    if(!inviting) {
+      return res.status(400).send('User doesn\'t exist');
+    }
+
+    User.findOne({_id: userId}, function (err, user) {
+      var index = user.inviting.indexOf(inviting._id);
+      if(index >= 0) {
+        user.inviting.splice(index, 1);
+        _.find(user.notifications, 'userId', inviting._id).remove();
+        user.friends.push(inviting._id);
+        user.save(function(err) {
+          if (err) return validationError(res, err);
+          res.json(user);
+        });
+        index = inviting.invited.indexOf(userId);
+        inviting.invited.splice(index, 1);
+        inviting.friends.push(user._id);
+        inviting.save(function(err) {
+          if (err) return validationError(res, err);
+        });
+      } else {
+        res.status(400).send('User is not inviting you');
+      }
+    });
+  });
+};
+
+exports.reject = function(req, res, next) {
+  var userId = req.user._id;
+  var inviting = req.params.id;
+
+  User.findById(req.params.id, function(err, user) {
+    if(err) return next(err);
+    var inviting = user;
+
+    if(!inviting) {
+      return res.status(400).send('User doesn\'t exist');
+    }
+
+    User.findOne({_id: userId}, function (err, user) {
+      var index = user.inviting.indexOf(inviting._id);
+      if(index >= 0) {
+        user.inviting.splice(index, 1);
+        _.find(user.notifications, 'userId', inviting._id).remove();
+        user.friends.splice(user.friends.indexOf(inviting._id), 1);
+        user.save(function(err) {
+          if (err) return validationError(res, err);
+          res.json(user);
+        });
+        index = inviting.invited.indexOf(userId);
+        inviting.invited.splice(inviting.invited.indexOf(userId), 1);
+        inviting.friends.splice(inviting.friends.indexOf(userId), 1);
+        inviting.save(inviting, function(err) {
+          if (err) return validationError(res, err);
+        });
+      } else {
+        res.status(400).send('User is not inviting you');
+      }
+    });
   });
 };
 

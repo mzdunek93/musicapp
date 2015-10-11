@@ -6,8 +6,13 @@
 
 var config = require('./environment');
 
+var sockets = [];
+
 // When the user disconnects.. perform this
 function onDisconnect(socket) {
+  console.log(socket.decoded_token)
+  sockets.splice(sockets.indexOf(socket), 1);
+    console.log(sockets.map(function(socket) { return socket.decoded_token; }));
 }
 
 // When the user connects.. perform this
@@ -19,6 +24,7 @@ function onConnect(socket) {
 
   // Insert sockets below
   require('../api/thing/thing.socket').register(socket);
+  require('../api/user/user.socket').register(socket);
 }
 
 module.exports = function (socketio) {
@@ -32,12 +38,15 @@ module.exports = function (socketio) {
   // 1. You will need to send the token in `client/components/socket/socket.service.js`
   //
   // 2. Require authentication here:
-  // socketio.use(require('socketio-jwt').authorize({
-  //   secret: config.secrets.session,
-  //   handshake: true
-  // }));
+  socketio.use(require('socketio-jwt').authorize({
+    secret: config.secrets.session,
+    handshake: true
+  }));
 
   socketio.on('connection', function (socket) {
+  console.log(socket.decoded_token)
+    sockets.push(socket);
+    console.log(sockets.map(function(socket) { return socket.decoded_token; }));
     socket.address = socket.handshake.address !== null ?
             socket.handshake.address.address + ':' + socket.handshake.address.port :
             process.env.DOMAIN;

@@ -2,18 +2,25 @@
 'use strict';
 
 angular.module('musicappApp')
-  .factory('socket', function(socketFactory) {
+  .factory('socket', function(socketFactory, $cookieStore) {
 
     // socket.io now auto-configures its connection when we ommit a connection url
-    var ioSocket = io('', {
-      // Send auth token on connection, you will need to DI the Auth service above
-      // 'query': 'token=' + Auth.getToken()
-      path: '/socket.io-client'
-    });
+    function connect() {
+      var ioSocket = io('', {
+        'query': 'token=' + $cookieStore.get('token'),
+        path: '/socket.io-client'
+      });
 
-    var socket = socketFactory({
-      ioSocket: ioSocket
-    });
+      ioSocket.connect();
+
+      console.log(ioSocket)
+
+      return socketFactory({
+        ioSocket: ioSocket
+      });
+    }
+
+    var socket = connect();
 
     return {
       socket: socket,
@@ -69,6 +76,15 @@ angular.module('musicappApp')
       unsyncUpdates: function (modelName) {
         socket.removeAllListeners(modelName + ':save');
         socket.removeAllListeners(modelName + ':remove');
+      },
+
+      connect: function () {
+        socket = connect();
+        console.log(socket);
+      },
+
+      disconnect: function () {
+        socket.disconnect();
       }
     };
   });

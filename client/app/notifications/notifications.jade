@@ -1,0 +1,8 @@
+li
+  a(href="" ng-click="notifications.toggle()")
+    span.glyphicon.glyphicon-envelope
+    div.notifications-number(ng-if="notifications.present") {{notifications.number}}
+  div.notifications(ng-show="notifications.show")
+    div(ng-if="!notifications.present") No notifications
+    div(ng-repeat="notification in notifications.list")
+      div(ng-include="'app/notifications/'+notification.type+'.html'")

@@ -54,4 +54,6 @@ angular.module('musicappApp', [
         }
       });
     });
+
+    $rootScope.isLoggedIn = Auth.isLoggedIn;
   });

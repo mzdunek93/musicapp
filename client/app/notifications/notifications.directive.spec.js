@@ -1,10 +1,10 @@
 'use strict';
 
-describe('Directive: chatBox', function () {
+describe('Directive: notifications', function () {
 
   // load the directive's module and view
   beforeEach(module('musicappApp'));
-  beforeEach(module('app/chatBox/chatBox.html'));
+  beforeEach(module('app/notifications/notifications.html'));
 
   var element, scope;
 
@@ -12,14 +12,14 @@ describe('Directive: chatBox', function () {
 
   beforeEach(inject(function ($rootScope, $state, Auth) {
     scope = $rootScope.$new();
-    Auth.setCurrentUser({role: true});
+    Auth.setCurrentUser({notifications: []});
     $state.expectTransitionTo('login');
   }));
 
   it('should make hidden element visible', inject(function ($compile) {
-    element = angular.element('<chat-box></chat-box>');
+    element = angular.element('<notifications></notifications>');
     element = $compile(element)(scope);
     scope.$apply();
-    expect(element.text()).toBe('this is the chatBox directive');
+    expect(element.text()).toBe('No notifications');
   }));
 });

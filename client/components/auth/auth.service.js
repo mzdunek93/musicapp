@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('musicappApp')
-  .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q) {
+  .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q, socket) {
     var currentUser = {};
     if($cookieStore.get('token')) {
       currentUser = User.get();
@@ -26,6 +26,7 @@ angular.module('musicappApp')
         }).
         success(function(data) {
           $cookieStore.put('token', data.token);
+          socket.connect();
           currentUser = User.get();
           deferred.resolve(data);
           return cb();
@@ -46,6 +47,7 @@ angular.module('musicappApp')
        */
       logout: function() {
         $cookieStore.remove('token');
+        socket.disconnect();
         currentUser = {};
       },
 
@@ -92,24 +94,11 @@ angular.module('musicappApp')
         }).$promise;
       },
 
-      invite: function(user, callback, error) {
+      invitation: function(type, user, callback, error) {
         var cb = callback || angular.noop;
         var error = error || angular.noop;
 
-        return User.invite({
-          id: user._id
-        }, function(user) {
-          return cb(user);
-        }, function(err) {
-          return error(err);
-        }).$promise;
-      },
-
-      uninvite: function(user, callback, error) {
-        var cb = callback || angular.noop;
-        var error = error || angular.noop;
-
-        return User.uninvite({
+        return User[type]({
           id: user._id
         }, function(user) {
           return cb(user);
@@ -125,6 +114,10 @@ angular.module('musicappApp')
        */
       getCurrentUser: function() {
         return currentUser;
+      },
+
+      setCurrentUser: function(user) {
+        currentUser = user;
       },
 
       /**
@@ -167,6 +160,17 @@ angular.module('musicappApp')
        */
       getToken: function() {
         return $cookieStore.get('token');
+      },
+
+      getFriends: function(callback, error) {
+        var cb = callback || angular.noop;
+        var error = error || angular.noop;
+
+        return User.getFriends(function(users) {
+          return cb(users);
+        }, function(err) {
+          return error(err);
+        });
       }
     };
   });

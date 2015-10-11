@@ -1,18 +1,18 @@
 'use strict';
 
-describe('Service: search', function () {
+describe('Service: Search', function () {
 
   // load the service's module
   beforeEach(module('musicappApp'));
 
   // instantiate service
-  var search;
-  beforeEach(inject(function (_search_) {
-    search = _search_;
+  var Search;
+  beforeEach(inject(function (_Search_) {
+    Search = _Search_;
   }));
 
   it('should do something', function () {
-    expect(!!search).toBe(true);
+    expect(!!Search).toBe(true);
   });
 
 });

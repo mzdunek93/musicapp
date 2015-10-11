@@ -1,0 +1,27 @@
+/**
+ * Broadcast updates to client when the model changes
+ */
+
+'use strict';
+
+var user = require('./user.model');
+
+exports.register = function(socket) {
+  user.schema.post('save', function (doc) {
+    onSave(socket, doc);
+  });
+  user.schema.post('remove', function (doc) {
+    onRemove(socket, doc);
+  });
+  socket.on('authenticated', function(socket) {
+    console.log(socket)
+  });
+}
+
+function onSave(socket, doc, cb) {
+  socket.emit('user:save', doc);
+}
+
+function onRemove(socket, doc, cb) {
+  socket.emit('user:remove', doc);
+}

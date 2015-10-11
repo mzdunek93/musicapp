@@ -1,11 +1,13 @@
 'use strict';
 
 describe('Main View', function() {
-  var page;
+  var page, signup, login;
 
   beforeEach(function() {
-    browser.get('/');
     page = require('./main.po');
+    signup = require('./signup.po');
+    login = require('./login.po');
+    login.login(signup.user1);
   });
 
   it('should include jumbotron with correct data', function() {

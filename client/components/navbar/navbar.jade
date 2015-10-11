@@ -28,6 +28,8 @@ div.navbar.navbar-default.navbar-static-top(ng-controller='NavbarCtrl')
         li(ng-show='isLoggedIn()')
           p.navbar-text Hello {{ getCurrentUser().username }}
 
+        notifications(ng-if='isLoggedIn()')
+
         li(ng-show='isLoggedIn()', ng-class='{active: isActive("/settings")}')
           a(href='/settings')
             span.glyphicon.glyphicon-cog

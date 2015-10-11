@@ -10,8 +10,10 @@ describe('Controller: MainCtrl', function () {
       scope,
       $httpBackend;
 
+  beforeEach(module('stateMock'));
+
   // Initialize the controller and a mock scope
-  beforeEach(inject(function (_$httpBackend_, $controller, $rootScope) {
+  beforeEach(inject(function (_$httpBackend_, $controller, $rootScope, $state) {
     $httpBackend = _$httpBackend_;
     $httpBackend.expectGET('/api/things')
       .respond(['HTML5 Boilerplate', 'AngularJS', 'Karma', 'Express']);
@@ -20,6 +22,7 @@ describe('Controller: MainCtrl', function () {
     MainCtrl = $controller('MainCtrl', {
       $scope: scope
     });
+    $state.expectTransitionTo('login');
   }));
 
   it('should attach a list of things to the scope', function () {
