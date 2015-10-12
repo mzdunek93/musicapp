@@ -1,0 +1,5 @@
+div.chat-window
+  div.chat-window-header {{window.username}}
+  div.chat-window-messages
+    div.chat-window-message(ng-repeat='message in window.messages' ng-class="{mine: message.mine}")
+      | {{message.body}}

@@ -11,6 +11,8 @@ angular.module('musicappApp')
       controller: function($scope, Auth, socket) {
         var chat = this;
         chat.users = [];
+        chat.windows = [];
+        chat.toggleWindow = toggleWindow;
 
         $scope.$watch(() => Auth.getCurrentUser(), function(currentUser) {
           chat.currentUser = currentUser;
@@ -27,9 +29,19 @@ angular.module('musicappApp')
             if (item._id === chat.currentUser._id) {
               Auth.setCurrentUser(item);
             }
-            console.log(users)
           });
         });
+
+        function toggleWindow(user) {
+          if(chat.windows.length >= 4) return;
+          user.active = !user.active;
+          if(user.active) {
+            chat.windows.push({username: user.username, messages: []});
+          } else {
+            chat.windows = chat.windows.filter(window => window.username != user.username);
+          }
+          console.log(chat.windows)
+        }
       },
       controllerAs: 'chat'
     };

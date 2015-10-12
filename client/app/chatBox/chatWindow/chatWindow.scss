@@ -1,0 +1,12 @@
+.chat-window {
+  position: fixed;
+  bottom: 0px;
+
+  .chat-window-header {
+    line-height: 20px;
+  }
+
+  .chat-window-messages {
+    height: 200px;
+  }
+}

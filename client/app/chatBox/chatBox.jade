@@ -1,6 +1,11 @@
 .container.chat-container
   div.chatbox(ng-show='chat.show')
     div.chatbox-header Chat
-    div.users-list(ng-repeat='user in chat.users')
-      a(href="" ng-click='toggleWindow(user)') {{user.username}}
-    input.users-list-filter(ng-model='chat.usersFilter')
+    div.chatbox-users
+      div.chatbox-user(ng-class='{active: user.active}'
+        ng-repeat='user in filteredUsers = (chat.users | username:chat.username)')
+        a(href="" ng-click='chat.toggleWindow(user)') {{user.username}}
+        {{user | online}}
+      div(ng-show="!filteredUsers.length") No users found
+    input.users-list-filter(ng-model='chat.username')
+  chat-window(data="window" ng-repeat="window in chat.windows")

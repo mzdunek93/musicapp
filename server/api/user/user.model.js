@@ -44,6 +44,7 @@ var UserSchema = new Schema({
   invited: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   inviting: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   notifications: [Notification],
+  connections: { type: Number, default: 0 },
   hashedPassword: { type: String, required: true },
   provider: String,
   salt: String,

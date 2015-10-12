@@ -10,7 +10,13 @@
     line-height: 20px;
   }
 
-  .users-list {
+  .chatbox-users {
     height: 200px;
+  }
+
+  .chatbox-user {
+    &.active {
+      background-color: #eee;
+    }
   }
 }

@@ -4,7 +4,11 @@ angular.module('musicappApp')
   .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q, socket) {
     var currentUser = {};
     if($cookieStore.get('token')) {
-      currentUser = User.get();
+      currentUser = User.get(function(v) {
+        if(currentUser.hasOwnProperty('role')) {
+          socket.connect();
+        }
+      });
     }
 
     return {

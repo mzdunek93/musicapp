@@ -13,8 +13,17 @@ exports.register = function(socket) {
   user.schema.post('remove', function (doc) {
     onRemove(socket, doc);
   });
-  socket.on('authenticated', function(socket) {
-    console.log(socket)
+
+  user.findOne({_id: socket.decoded_token._id}, function(err, user) {
+    user.connections += 1;
+    user.save();
+  });
+
+  socket.on('disconnect', function () {
+    user.findOne({_id: socket.decoded_token._id}, function(err, user) {
+      user.connections -= 1;
+      user.save();
+    });
   });
 }
 

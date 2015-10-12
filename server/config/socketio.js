@@ -10,9 +10,6 @@ var sockets = [];
 
 // When the user disconnects.. perform this
 function onDisconnect(socket) {
-  console.log(socket.decoded_token)
-  sockets.splice(sockets.indexOf(socket), 1);
-    console.log(sockets.map(function(socket) { return socket.decoded_token; }));
 }
 
 // When the user connects.. perform this
@@ -44,9 +41,6 @@ module.exports = function (socketio) {
   }));
 
   socketio.on('connection', function (socket) {
-  console.log(socket.decoded_token)
-    sockets.push(socket);
-    console.log(sockets.map(function(socket) { return socket.decoded_token; }));
     socket.address = socket.handshake.address !== null ?
             socket.handshake.address.address + ':' + socket.handshake.address.port :
             process.env.DOMAIN;
